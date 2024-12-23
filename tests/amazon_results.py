@@ -9,6 +9,8 @@ import time
 import random
 
 
+
+
 user_agents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36",
@@ -25,40 +27,42 @@ user_agents = [
     "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0",
 ]
 
+def main():
+    service = Service(executable_path="../chromedriver.exe")
 
-service = Service(executable_path="chromedriver.exe")
+    options = webdriver.ChromeOptions()
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument(f"user-agent={random.choice(user_agents)}")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-notifications")
 
-options = webdriver.ChromeOptions()
-options.add_argument("--disable-blink-features=AutomationControlled")
-options.add_argument(f"user-agent={random.choice(user_agents)}")
-options.add_argument("--window-size=1920,1080")
-options.add_argument("--disable-notifications")
+    driver = webdriver.Chrome(service=service, options=options)
+    stealth(
+        driver,
+        languages=["en-US", "en"],
+        vendor="Google Inc.",
+        platform="Win32",
+        webgl_vendor="Intel Inc.",
+        renderer="Intel Iris OpenGL Engine",
+        fix_hairline=True,
+    )
 
-driver = webdriver.Chrome(service=service, options=options)
-stealth(
-    driver,
-    languages=["en-US", "en"],
-    vendor="Google Inc.",
-    platform="Win32",
-    webgl_vendor="Intel Inc.",
-    renderer="Intel Iris OpenGL Engine",
-    fix_hairline=True,
-)
+    driver.get("https://www.amazon.com/")
 
+    time.sleep(random.uniform(5, 10))
 
+    search_box = driver.find_element(By.ID, "twotabsearchtextbox")
+    search_box.send_keys("laptop" + Keys.RETURN)
 
-driver.get("https://www.amazon.com/")
+    time.sleep(random.uniform(5, 10))
 
-time.sleep(random.uniform(5, 10))
+    titles = driver.find_elements(By.CSS_SELECTOR, ".s-main-slot .s-result-item h2")
 
-search_box = driver.find_element(By.ID, "twotabsearchtextbox")
-search_box.send_keys("laptop" + Keys.RETURN)
+    for i in range(1, min(11, len(titles))):
+        print(f"Result {i}: {titles[i].text}")
 
-time.sleep(random.uniform(5, 15))
+    time.sleep(random.uniform(10, 15))
+    driver.quit()
 
-
-print("Search completed successfully!")
-
-time.sleep(random.uniform(10, 15))
-
-driver.quit()
+if __name__ == "__main__":
+    main()
