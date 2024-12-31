@@ -55,11 +55,16 @@ def main():
     search_box.send_keys("laptop" + Keys.RETURN)
 
     time.sleep(random.uniform(5, 10))
+    
 
-    titles = driver.find_elements(By.CSS_SELECTOR, ".s-main-slot .s-result-item h2")
+    products = driver.find_elements(By.CLASS_NAME, "a-section")
+    print(f"Found {len(products)} product containers.")
 
-    for i in range(1, min(11, len(titles))):
-        print(f"Result {i}: {titles[i].text}")
+    for i, product in enumerate(products[:10], start=1):
+        title_elements = product.find_elements(By.CSS_SELECTOR, ".s-main-slot .s-result-item h2")
+        title = title_elements[0].text if title_elements else "No title found"
+    
+        print(f"Result {i}: {title}")
 
     time.sleep(random.uniform(10, 15))
     driver.quit()
